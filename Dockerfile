@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x mvnw || true
-RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+RUN chmod +x mvnw
+RUN ./mvnw clean package -Dmaven.test.skip=true
 
 EXPOSE 10000
 
