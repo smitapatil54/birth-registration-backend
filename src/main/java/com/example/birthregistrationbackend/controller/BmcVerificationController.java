@@ -1,7 +1,9 @@
 package com.example.birthregistrationbackend.controller;
 
 import com.example.birthregistrationbackend.entity.BirthRegistration;
+import com.example.birthregistrationbackend.entity.Certificate;
 import com.example.birthregistrationbackend.repository.BirthRegistrationRepository;
+import com.example.birthregistrationbackend.repository.CertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,9 @@ public class BmcVerificationController {
 
     @Autowired
     private BirthRegistrationRepository repository;
+
+    @Autowired
+    private CertificateRepository certificateRepository;
 
     // BMC dashboard me sirf hospital approved applications dikhengi
     @GetMapping("/pending")
@@ -33,12 +38,34 @@ public class BmcVerificationController {
             return null;
         }
 
+        // Status update
         application.setStatus("Certificate Generated");
 
         // Unique certificate number generate
-        application.setApplicationId(
-                "CERT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase()
-        );
+        String certNumber = "CERT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+        application.setApplicationId(certNumber);
+
+        // 🔥 BONUS FIX (duplicate prevent + certificate save)
+        Certificate existing = certificateRepository.findByBirthRegistrationId(application.getId());
+
+        if (existing == null) {
+            Certificate cert = new Certificate();
+
+            cert.setBirthRegistrationId(application.getId());
+            cert.setApplicationId(certNumber);
+            cert.setRegistrationNumber(certNumber);
+
+            cert.setChildName(application.getChildName());
+            cert.setFatherName(application.getFatherName());
+            cert.setMotherName(application.getMotherName());
+            cert.setBirthDate(application.getBirthDate());
+            cert.setHospitalName(application.getHospitalName());
+
+            cert.setIssuedBy("BMC");
+
+            certificateRepository.save(cert);
+        }
 
         return repository.save(application);
     }

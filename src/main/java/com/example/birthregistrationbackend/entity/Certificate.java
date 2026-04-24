@@ -1,17 +1,17 @@
 package com.example.birthregistrationbackend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "certificate")
 public class Certificate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 🔥 IMPORTANT (unique hona chahiye)
+    @Column(nullable = false)
     private Long birthRegistrationId;
 
     private String applicationId;
@@ -24,6 +24,8 @@ public class Certificate {
     private String hospitalName;
 
     private String issuedBy;
+
+    // GETTERS & SETTERS
 
     public Long getId() {
         return id;
